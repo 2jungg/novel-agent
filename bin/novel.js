@@ -1,18 +1,17 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import chalk from 'chalk';
+import Conf from 'conf';
 import { setupAuth } from '../src/auth.js';
+import { 
+    initProject, 
+    writeChapter, 
+    critiqueChapter, 
+    exportNovel, 
+    visualizeRelations 
+} from '../src/engine.js';
 
-const program = new Command();
-
-program
-  .name('novel')
-  .description('AI Web-novel Agent CLI')
-  .version('0.1.0');
-
-import { setupAuth } from '../src/auth.js';
-import { initProject, writeChapter } from '../src/engine.js';
-
+const config = new Conf({ projectName: 'novel-agent' });
 const program = new Command();
 
 program
@@ -61,6 +60,14 @@ program
     } else {
       console.log(chalk.blue(`Current Model: ${config.get('default_model') || 'gemini-3-flash'}`));
     }
+  });
+
+program
+  .command('write [number]')
+  .description('Write a specific chapter')
+  .option('-e, --edit [message]', 'Re-write or edit an existing chapter with specific instructions')
+  .action(async (number, options) => {
+    await writeChapter(number, options);
   });
 
 program
