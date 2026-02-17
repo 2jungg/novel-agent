@@ -13,16 +13,19 @@ export async function callAI(prompt, systemInstruction = "") {
     const genAI = new GoogleGenerativeAI(apiKey);
     const modelName = config.get('default_model') || 'gemini-3-flash-preview';
     
-    // Safety check for common model name mismatches in SDK v1
-    const finalModelName = modelName.includes('/') ? modelName : `models/${modelName}`;
+    // SDK v1 requires the 'models/' prefix if not present, but 
+    // it sometimes fails if manually added to already prefixed names.
+    const finalModelName = modelName.startsWith('models/') ? modelName : `models/${modelName}`;
     
     const model = genAI.getGenerativeModel({ 
-        model: finalModelName,
-        systemInstruction: systemInstruction 
+        model: finalModelName
     });
 
     try {
-        const result = await model.generateContent(prompt);
+        const result = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            systemInstruction: systemInstruction ? { role: 'system', parts: [{ text: systemInstruction }] } : undefined
+        });
         const response = await result.response;
         return response.text();
     } catch (error) {

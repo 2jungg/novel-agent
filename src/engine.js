@@ -104,16 +104,22 @@ export async function writeChapter(chapterNum, options) {
     console.log(chalk.yellow(`\n✍️ AI is drafting Chapter ${targetNum}...`));
     
     const context = `World: ${bible.world.setting}\nProtagonist: ${bible.protagonist}\nConflict: ${bible.plot_seed}`;
-    const instruction = options.edit ? `Edit Chapter ${targetNum} based on: ${options.edit}` : `Write a new Chapter ${targetNum}.`;
+    const prompt = `You are a best-selling web-novel author known for immersive prose. 
+    ${context}
     
-    const prompt = `${context}\n\n${instruction}\n\nPlease provide the prose in Korean, maintaining a professional web-novel style.`;
+    ${options.edit ? `Edit Chapter ${targetNum} based on: ${options.edit}` : `Write a new Chapter ${targetNum}.`}
+    
+    Please provide the prose in Korean, maintaining a professional web-novel style. 
+    Ensure consistency with the world and character settings mentioned above.
+    Do not include any commentary, only the novel content.`;
 
     try {
-        const prose = await callAI(prompt, "You are a best-selling web-novel author known for immersive prose.");
+        const prose = await callAI(prompt);
         fs.writeFileSync(filePath, prose);
         console.log(chalk.green(`\n✨ Chapter ${targetNum} has been written to ${filePath}`));
     } catch (e) {
         console.error(chalk.red("\n❌ Drafting failed. Check your API key or connection."));
+        console.error(e.message);
     }
 }
 
