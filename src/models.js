@@ -15,10 +15,11 @@ export async function listAvailableModels() {
         // The SDK doesn't expose a simple listModels, we use the REST endpoint logic via fetch or similar
         // For CLI utility, we'll provide a curated list of known working models for Gemini SDK v1
         const commonModels = [
+            "gemini-2.0-flash",
+            "gemini-2.0-flash-lite-preview-02-05",
+            "gemini-2.0-pro-exp-02-05",
             "gemini-1.5-flash",
-            "gemini-1.5-flash-8b",
-            "gemini-1.5-pro",
-            "gemini-1.0-pro"
+            "gemini-1.5-pro"
         ];
         
         console.log(chalk.cyan("\n🤖 Available & Supported Models (Curated):"));
