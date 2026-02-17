@@ -4,11 +4,13 @@
 A TUI-based autonomous web-novel generation agent that manages world-building, character consistency, and serialized storytelling.
 
 ## 2. Tech Stack
-- **Language:** Python (for rapid prototyping and LLM orchestration)
-- **TUI Framework:** `Textual` or `Rich` (high-quality terminal UI)
+- **Architecture:** Node.js Wrapper (CLI/NPM) + Python Core (TUI/LLM Engine)
+- **Package Manager:** NPM (for distribution as `@2jungg/novel-agent`)
+- **TUI Framework:** `Textual` (Python) - Called by Node.js
+- **Auth:** OAuth2 (Google/OpenAI) with local callback server
 - **AI Integration:** 
-  - OpenClaw Internal Bridge (reusing existing API keys and sessions)
-  - Direct API (LiteLLM or LangChain) for independent operation
+  - Official SDKs (Google Generative AI, OpenAI)
+  - Managed via encrypted local config storage (`conf`)
 - **Database:** JSON/Markdown based (for human-readability and Git-sync)
 
 ## 3. Core Components
