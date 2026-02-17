@@ -51,6 +51,19 @@ program
   });
 
 program
+  .command('config')
+  .description('Manage configuration (e.g., set default model)')
+  .option('-m, --model <model>', 'Set default AI model')
+  .action((options) => {
+    if (options.model) {
+      config.set('default_model', options.model);
+      console.log(chalk.green(`Default model set to: ${options.model}`));
+    } else {
+      console.log(chalk.blue(`Current Model: ${config.get('default_model') || 'gemini-3-flash'}`));
+    }
+  });
+
+program
   .command('critique <number>')
   .description('Get AI feedback on a specific chapter for consistency and quality')
   .action(async (number) => {
