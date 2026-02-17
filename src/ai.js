@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import Conf from 'conf';
 import chalk from 'chalk';
+import axios from 'axios';
 
 const config = new Conf({ projectName: 'novel-agent' });
 
