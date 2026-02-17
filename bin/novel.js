@@ -51,11 +51,24 @@ program
   });
 
 program
-  .command('write [number]')
-  .description('Write a specific chapter')
-  .option('-e, --edit [message]', 'Re-write or edit an existing chapter with specific instructions')
-  .action(async (number, options) => {
-    await writeChapter(number, options);
+  .command('critique <number>')
+  .description('Get AI feedback on a specific chapter for consistency and quality')
+  .action(async (number) => {
+    await critiqueChapter(number);
+  });
+
+program
+  .command('export [format]')
+  .description('Export the entire novel (PDF, EPUB, or TXT)')
+  .action(async (format) => {
+    await exportNovel(format || 'txt');
+  });
+
+program
+  .command('relations')
+  .description('Visualize character relationships and status')
+  .action(async () => {
+    await visualizeRelations();
   });
 
 program.parse();
