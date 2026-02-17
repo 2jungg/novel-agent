@@ -2,6 +2,7 @@
   "name": "@2jungg/novel-agent",
   "version": "0.1.0",
   "description": "An autonomous AI web-novel generation agent with TUI.",
+  "type": "module",
   "main": "src/index.js",
   "bin": {
     "novel": "bin/novel.js"
