@@ -18,14 +18,12 @@ export async function callAI(prompt, systemInstruction = "") {
     const finalModelName = modelName.startsWith('models/') ? modelName : `models/${modelName}`;
     
     const model = genAI.getGenerativeModel({ 
-        model: finalModelName
+        model: finalModelName,
+        systemInstruction: systemInstruction ? { role: 'system', parts: [{ text: systemInstruction }] } : undefined
     });
 
     try {
-        const result = await model.generateContent({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            systemInstruction: systemInstruction ? { role: 'system', parts: [{ text: systemInstruction }] } : undefined
-        });
+        const result = await model.generateContent(prompt);
         const response = await result.response;
         return response.text();
     } catch (error) {
