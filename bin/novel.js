@@ -53,7 +53,7 @@ program
 program
   .command('write [number]')
   .description('Write a specific chapter')
-  .option('-e, --edit', 'Re-write or edit an existing chapter')
+  .option('-e, --edit [message]', 'Re-write or edit an existing chapter with specific instructions')
   .action(async (number, options) => {
     await writeChapter(number, options);
   });

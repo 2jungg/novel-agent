@@ -94,10 +94,22 @@ export async function writeChapter(chapterNum, options) {
     const fileName = `chapter_${targetNum}.md`;
     const filePath = validatePath(path.join(manuscriptDir, fileName));
 
-    if (fs.existsSync(filePath) && !options.edit) {
-        console.error(chalk.red(`Error: Chapter ${targetNum} already exists. Use --edit to overwrite.`));
-        return;
+    if (fs.existsSync(filePath)) {
+        if (!options.edit) {
+            console.error(chalk.red(`Error: Chapter ${targetNum} already exists. Use --edit to overwrite.`));
+            return;
+        }
+        
+        const editInstructions = typeof options.edit === 'string' ? options.edit : 'General improvement';
+        console.log(chalk.cyan(`Targeting existing Chapter ${targetNum} for edit...`));
+        console.log(chalk.italic(`Instructions: "${editInstructions}"`));
+        // Logic: Load current chapter, pass to AI with instructions
+    } else {
+        if (options.edit) {
+            console.error(chalk.red(`Error: Chapter ${targetNum} does not exist. You cannot edit a non-existent chapter.`));
+            return;
+        }
+        console.log(chalk.yellow(`Writing brand new Chapter ${targetNum}...`));
+        // Logic: Call AI to write new prose...
     }
-
-    console.log(chalk.yellow(`${options.edit ? 'Editing' : 'Writing'} Chapter ${targetNum}...`));
 }
