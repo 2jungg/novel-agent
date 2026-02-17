@@ -12,8 +12,12 @@ export async function callAI(prompt, systemInstruction = "") {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const modelName = config.get('default_model') || 'gemini-1.5-flash';
+    
+    // Safety check for common model name mismatches in SDK v1
+    const finalModelName = modelName.includes('/') ? modelName : `models/${modelName}`;
+    
     const model = genAI.getGenerativeModel({ 
-        model: modelName,
+        model: finalModelName,
         systemInstruction: systemInstruction 
     });
 

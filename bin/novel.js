@@ -10,6 +10,7 @@ import {
     exportNovel, 
     visualizeRelations 
 } from '../src/engine.js';
+import { listAvailableModels } from '../src/models.js';
 
 const config = new Conf({ projectName: 'novel-agent' });
 const program = new Command();
@@ -53,12 +54,15 @@ program
   .command('config')
   .description('Manage configuration (e.g., set default model)')
   .option('-m, --model <model>', 'Set default AI model')
-  .action((options) => {
-    if (options.model) {
+  .option('-l, --list', 'List available models')
+  .action(async (options) => {
+    if (options.list) {
+      await listAvailableModels();
+    } else if (options.model) {
       config.set('default_model', options.model);
       console.log(chalk.green(`Default model set to: ${options.model}`));
     } else {
-      console.log(chalk.blue(`Current Model: ${config.get('default_model') || 'gemini-3-flash'}`));
+      console.log(chalk.blue(`Current Model: ${config.get('default_model') || 'gemini-1.5-flash'}`));
     }
   });
 
