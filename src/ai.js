@@ -10,24 +10,33 @@ export async function callAI(prompt, systemInstruction = "") {
         throw new Error("API Key not found. Please run 'novel auth' first.");
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
     const modelName = config.get('default_model') || 'gemini-3-flash-preview';
-    
-    // SDK v1 requires the 'models/' prefix if not present, but 
-    // it sometimes fails if manually added to already prefixed names.
     const finalModelName = modelName.startsWith('models/') ? modelName : `models/${modelName}`;
     
-    const model = genAI.getGenerativeModel({ 
-        model: finalModelName,
-        systemInstruction: systemInstruction ? { role: 'system', parts: [{ text: systemInstruction }] } : undefined
-    });
+    // Switch to v1beta for Gemini 3.0 support
+    const url = `https://generativelanguage.googleapis.com/v1beta/${finalModelName}:generateContent?key=${apiKey}`;
+
+    const payload = {
+        contents: [{ role: 'user', parts: [{ text: prompt }] }]
+    };
+
+    if (systemInstruction) {
+        payload.system_instruction = { parts: [{ text: systemInstruction }] };
+    }
 
     try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        return response.text();
+        const response = await axios.post(url, payload, {
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (response.data && response.data.candidates && response.data.candidates[0].content) {
+            return response.data.candidates[0].content.parts[0].text;
+        } else {
+            throw new Error("Invalid response format from Gemini API");
+        }
     } catch (error) {
-        console.error(chalk.red(`AI Call Failed: ${error.message}`));
-        throw error;
+        const errMsg = error.response ? JSON.stringify(error.response.data) : error.message;
+        console.error(chalk.red(`AI Call Failed (Direct REST): ${errMsg}`));
+        throw new Error(errMsg);
     }
 }
