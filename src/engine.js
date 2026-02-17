@@ -6,8 +6,24 @@ import Conf from 'conf';
 
 const config = new Conf({ projectName: 'novel-agent' });
 
+/**
+ * Security Sandbox: Ensures all file operations are restricted 
+ * to the project directory or the current working directory.
+ */
+function validatePath(targetPath) {
+    const root = process.cwd();
+    const resolvedPath = path.resolve(targetPath);
+    if (!resolvedPath.startsWith(root)) {
+        throw new Error(`Security Violation: Access denied to path outside project root: ${resolvedPath}`);
+    }
+    return resolvedPath;
+}
+
 export async function initProject(projectName) {
     const projectPath = path.join(process.cwd(), projectName);
+    
+    // Safety check: ensure we're not trying to escape via ../
+    validatePath(projectPath);
     
     if (fs.existsSync(projectPath)) {
         console.error(chalk.red(`Error: Directory ${projectName} already exists.`));
@@ -17,8 +33,10 @@ export async function initProject(projectName) {
     // 1. Create folders
     const dirs = ['bible', 'characters', 'plot', 'manuscript', 'style'];
     for (const dir of dirs) {
-        fs.ensureDirSync(path.join(projectPath, dir));
+        const dirPath = validatePath(path.join(projectPath, dir));
+        fs.ensureDirSync(dirPath);
     }
+    // ... rest of the code
 
     console.log(chalk.blue('Consulting the Muse for concepts...'));
 
@@ -54,12 +72,13 @@ export async function initProject(projectName) {
         createdAt: new Date().toISOString()
     };
     
-    fs.writeJsonSync(path.join(projectPath, 'bible', 'config.json'), bibleData);
+    const biblePath = validatePath(path.join(projectPath, 'bible', 'config.json'));
+    fs.writeJsonSync(biblePath, bibleData);
     console.log(chalk.green(`\nProject "${projectName}" initialized with "${chosen.name}"!`));
 }
 
 export async function writeChapter(chapterNum, options) {
-    const manuscriptDir = path.join(process.cwd(), 'manuscript');
+    const manuscriptDir = validatePath(path.join(process.cwd(), 'manuscript'));
     if (!fs.existsSync(manuscriptDir)) {
         console.error(chalk.red('Error: Not in a novel project directory.'));
         return;
@@ -73,7 +92,7 @@ export async function writeChapter(chapterNum, options) {
     }
 
     const fileName = `chapter_${targetNum}.md`;
-    const filePath = path.join(manuscriptDir, fileName);
+    const filePath = validatePath(path.join(manuscriptDir, fileName));
 
     if (fs.existsSync(filePath) && !options.edit) {
         console.error(chalk.red(`Error: Chapter ${targetNum} already exists. Use --edit to overwrite.`));
@@ -81,5 +100,4 @@ export async function writeChapter(chapterNum, options) {
     }
 
     console.log(chalk.yellow(`${options.edit ? 'Editing' : 'Writing'} Chapter ${targetNum}...`));
-    // Call AI to write prose...
 }
